@@ -1,0 +1,30 @@
+OrdererOrgs:
+  - Name: Orderer
+    Domain: example.com
+    EnableNodeOUs: true
+
+    Specs:
+      - Hostname: orderer0
+      - Hostname: orderer1
+      - Hostname: orderer2
+
+PeerOrgs:
+  - Name: Vara
+    Domain: vara.example.com
+    EnableNodeOUs: true
+
+    Template:
+      Count: 1
+
+    Users:
+      Count: 1
+
+  - Name: Sahaj
+    Domain: sahaj.example.com
+    EnableNodeOUs: true
+
+    Template:
+      Count: 1
+
+    Users:
+      Count: 1

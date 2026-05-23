@@ -1,0 +1,219 @@
+Organizations:
+
+  - &OrdererOrg
+    Name: OrdererMSP
+    ID: OrdererMSP
+    MSPDir: ../organizations/ordererOrganizations/example.com/msp
+
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &VaraMSP
+    Name: VaraMSP
+    ID: VaraMSP
+    MSPDir: ../organizations/peerOrganizations/vara.example.com/msp
+
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('VaraMSP.admin', 'VaraMSP.peer', 'VaraMSP.client')"
+
+      Writers:
+        Type: Signature
+        Rule: "OR('VaraMSP.admin', 'VaraMSP.client')"
+
+      Admins:
+        Type: Signature
+        Rule: "OR('VaraMSP.admin')"
+
+      Endorsement:
+        Type: Signature
+        Rule: "OR('VaraMSP.peer')"
+
+    AnchorPeers:
+      - Host: peer0.vara.example.com
+        Port: 7051
+
+  - &SahajMSP
+    Name: SahajMSP
+    ID: SahajMSP
+    MSPDir: ../organizations/peerOrganizations/sahaj.example.com/msp
+
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('SahajMSP.admin', 'SahajMSP.peer', 'SahajMSP.client')"
+
+      Writers:
+        Type: Signature
+        Rule: "OR('SahajMSP.admin', 'SahajMSP.client')"
+
+      Admins:
+        Type: Signature
+        Rule: "OR('SahajMSP.admin')"
+
+      Endorsement:
+        Type: Signature
+        Rule: "OR('SahajMSP.peer')"
+
+    AnchorPeers:
+      - Host: peer0.sahaj.example.com
+        Port: 9051
+
+Capabilities:
+
+  Channel: &ChannelCapabilities
+    V2_0: true
+
+  Orderer: &OrdererCapabilities
+    V2_0: true
+
+  Application: &ApplicationCapabilities
+    V2_5: true
+
+Application: &ApplicationDefaults
+
+  Organizations:
+
+  Policies:
+
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+
+  OrdererType: etcdraft
+
+  Addresses:
+    - orderer0.example.com:7050
+    - orderer1.example.com:8050
+    - orderer2.example.com:9050
+
+  BatchTimeout: 2s
+
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+  Organizations:
+
+  Capabilities:
+    <<: *OrdererCapabilities
+
+Channel: &ChannelDefaults
+
+  Policies:
+
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+
+    Admins:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+
+  LandTokenGenesis:
+
+    <<: *ChannelDefaults
+
+    Orderer:
+      <<: *OrdererDefaults
+
+      Organizations:
+        - *OrdererOrg
+
+      EtcdRaft:
+        Consenters:
+          - Host: orderer0.example.com
+            Port: 7050
+            ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/server.crt
+            ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/server.crt
+
+          - Host: orderer1.example.com
+            Port: 8050
+            ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+            ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+
+          - Host: orderer2.example.com
+            Port: 9050
+            ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+            ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+
+    Consortiums:
+      LandConsortium:
+        Organizations:
+          - *VaraMSP
+          - *SahajMSP
+
+  LandChannel:
+
+    Consortium: LandConsortium
+
+    <<: *ChannelDefaults
+
+    Application:
+      <<: *ApplicationDefaults
+
+      Organizations:
+        - *VaraMSP
+        - *SahajMSP
+
+      Capabilities:
+        <<: *ApplicationCapabilities
