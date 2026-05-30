@@ -1,0 +1,78 @@
+version: '3.9'
+
+networks:
+  land_network:
+
+services:
+
+  tlsca-orderer:
+    container_name: tlsca-orderer
+    image: hyperledger/fabric-ca:1.5.15
+
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=tlsca-orderer
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+
+    ports:
+      - "11054:7054"
+
+    command: >
+      sh -c '
+      fabric-ca-server start
+      -b admin:adminpw
+      '
+
+    volumes:
+      - ../organizations/fabric-ca/tlsca-orderer:/etc/hyperledger/fabric-ca-server
+
+    networks:
+      - land_network
+
+  tlsca-vara:
+    container_name: tlsca-vara
+    image: hyperledger/fabric-ca:1.5.15
+
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=tlsca-vara
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+
+    ports:
+      - "12054:7054"
+
+    command: >
+      sh -c '
+      fabric-ca-server start
+      -b admin:adminpw
+      '
+
+    volumes:
+      - ../organizations/fabric-ca/tlsca-vara:/etc/hyperledger/fabric-ca-server
+
+    networks:
+      - land_network
+
+  tlsca-sahaj:
+    container_name: tlsca-sahaj
+    image: hyperledger/fabric-ca:1.5.15
+
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=tlsca-sahaj
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+
+    ports:
+      - "13054:7054"
+
+    command: >
+      sh -c '
+      fabric-ca-server start
+      -b admin:adminpw
+      '
+
+    volumes:
+      - ../organizations/fabric-ca/tlsca-sahaj:/etc/hyperledger/fabric-ca-server
+
+    networks:
+      - land_network

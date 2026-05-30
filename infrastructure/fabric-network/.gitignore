@@ -1,0 +1,72 @@
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Generated Fabric organizations and crypto material
+organizations/
+!organizations/.gitkeep
+
+# Generated channel and config artifacts
+channel-artifacts/*.block
+channel-artifacts/*.tx
+*.pb
+*_block*.json
+*_block*.pb
+application_groups.json
+config.json
+config.json.bak
+config_block.json
+modified_config*.json
+sahaj_msp.json
+vara_msp.json
+
+# Runtime state and backups
+backup-peer-state/
+fabric-runtime/
+connection-profile/
+explorer/runtime-fabric/
+explorer/wallet/
+explorer/fabric/
+explorer/dbconfig/
+explorer/connection-profile/
+explorer/configs/
+explorer-npm-logs/
+
+# Local TLS bundle generated for gossip trust
+organizations/**/tls/combined-ca.crt
+
+# Logs, archives, and temporary files
+*.log
+npm-debug.log*
+*.tar.gz
+*.bak
+*.save
+
+# Local scratch / accidental artifacts
+Attempt
+Auto-detected
+Cannot
+Created
+Creating
+DB
+Deployed
+Discovery
+Entering
+Exit
+Gossip
+Initialize
+Initialized
+Initializing
+Loading
+No
+Returning
+Started
+Starting
+The
+concurrency
+deploying
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db

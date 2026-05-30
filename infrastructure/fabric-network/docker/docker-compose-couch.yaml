@@ -1,0 +1,3 @@
+# Legacy placeholder.
+# CouchDB is defined directly in docker-compose-peers.yaml so peer and state DB
+# lifecycles stay coupled.

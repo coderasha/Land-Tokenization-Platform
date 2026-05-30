@@ -3,6 +3,7 @@ Organizations:
   - &OrdererOrg
     Name: OrdererMSP
     ID: OrdererMSP
+
     MSPDir: ../organizations/ordererOrganizations/example.com/msp
 
     Policies:
@@ -18,9 +19,10 @@ Organizations:
         Type: Signature
         Rule: "OR('OrdererMSP.admin')"
 
-  - &VaraMSP
+  - &Vara
     Name: VaraMSP
     ID: VaraMSP
+
     MSPDir: ../organizations/peerOrganizations/vara.example.com/msp
 
     Policies:
@@ -44,9 +46,10 @@ Organizations:
       - Host: peer0.vara.example.com
         Port: 7051
 
-  - &SahajMSP
+  - &Sahaj
     Name: SahajMSP
     ID: SahajMSP
+
     MSPDir: ../organizations/peerOrganizations/sahaj.example.com/msp
 
     Policies:
@@ -68,7 +71,7 @@ Organizations:
 
     AnchorPeers:
       - Host: peer0.sahaj.example.com
-        Port: 9051
+        Port: 8051
 
 Capabilities:
 
@@ -119,6 +122,24 @@ Orderer: &OrdererDefaults
     - orderer1.example.com:8050
     - orderer2.example.com:9050
 
+  EtcdRaft:
+    Consenters:
+
+      - Host: orderer0.example.com
+        Port: 7050
+        ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/server.crt
+
+      - Host: orderer1.example.com
+        Port: 8050
+        ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
+
+      - Host: orderer2.example.com
+        Port: 9050
+        ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+        ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
+
   BatchTimeout: 2s
 
   BatchSize:
@@ -127,6 +148,7 @@ Orderer: &OrdererDefaults
     PreferredMaxBytes: 512 KB
 
   Policies:
+
     Readers:
       Type: ImplicitMeta
       Rule: "ANY Readers"
@@ -142,8 +164,6 @@ Orderer: &OrdererDefaults
     BlockValidation:
       Type: ImplicitMeta
       Rule: "ANY Writers"
-
-  Organizations:
 
   Capabilities:
     <<: *OrdererCapabilities
@@ -179,28 +199,12 @@ Profiles:
       Organizations:
         - *OrdererOrg
 
-      EtcdRaft:
-        Consenters:
-          - Host: orderer0.example.com
-            Port: 7050
-            ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/server.crt
-            ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/server.crt
-
-          - Host: orderer1.example.com
-            Port: 8050
-            ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
-            ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/server.crt
-
-          - Host: orderer2.example.com
-            Port: 9050
-            ClientTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-            ServerTLSCert: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/server.crt
-
     Consortiums:
+
       LandConsortium:
         Organizations:
-          - *VaraMSP
-          - *SahajMSP
+          - *Vara
+          - *Sahaj
 
   LandChannel:
 
@@ -208,12 +212,15 @@ Profiles:
 
     <<: *ChannelDefaults
 
+    Orderer:
+      <<: *OrdererDefaults
+
+      Organizations:
+        - *OrdererOrg
+
     Application:
       <<: *ApplicationDefaults
 
       Organizations:
-        - *VaraMSP
-        - *SahajMSP
-
-      Capabilities:
-        <<: *ApplicationCapabilities
+        - *Vara
+        - *Sahaj

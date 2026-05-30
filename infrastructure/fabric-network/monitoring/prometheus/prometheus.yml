@@ -1,0 +1,32 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+
+  - job_name: 'peer0-vara'
+    static_configs:
+      - targets: ['peer0.vara.example.com:9444']
+
+  - job_name: 'peer0-sahaj'
+    static_configs:
+      - targets: ['peer0.sahaj.example.com:10444']
+
+  - job_name: 'orderer0'
+    static_configs:
+      - targets: ['orderer0.example.com:9443']
+
+  - job_name: 'orderer1'
+    static_configs:
+      - targets: ['orderer1.example.com:10443']
+
+  - job_name: 'orderer2'
+    static_configs:
+      - targets: ['orderer2.example.com:11443']
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['cadvisor:8080']
+
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']

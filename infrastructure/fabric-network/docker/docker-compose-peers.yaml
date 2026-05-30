@@ -1,0 +1,147 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${CONTAINER_LOG_MAX_SIZE:-50m}
+    max-file: '${CONTAINER_LOG_MAX_FILES:-5}'
+
+services:
+  couchdb0:
+    container_name: couchdb0
+    image: couchdb:3.3
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-change-me}
+    ports:
+      - '5984:5984'
+    networks:
+      - land_network
+
+  couchdb1:
+    container_name: couchdb1
+    image: couchdb:3.3
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER:-admin}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD:-change-me}
+    ports:
+      - '6984:5984'
+    networks:
+      - land_network
+
+  peer0.vara.example.com:
+    container_name: peer0.vara.example.com
+    image: hyperledger/fabric-peer:2.5.12
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      - FABRIC_LOGGING_SPEC=${FABRIC_LOGGING_SPEC:-INFO}
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/combined-ca.crt
+      - CORE_PEER_TLS_CLIENTCERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_CLIENTKEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/etc/hyperledger/fabric/tls/combined-ca.crt
+      - CORE_PEER_ID=peer0.vara.example.com
+      - CORE_PEER_ADDRESS=peer0.vara.example.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.vara.example.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.vara.example.com:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.vara.example.com:7051
+      - CORE_PEER_GOSSIP_USELEADERELECTION=false
+      - CORE_PEER_GOSSIP_ORGLEADER=true
+      - CORE_PEER_LOCALMSPID=VaraMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${COUCHDB_USER:-admin}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${COUCHDB_PASSWORD:-change-me}
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:9444
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=docker_land_network
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    volumes:
+      - ../organizations/peerOrganizations/vara.example.com/peers/peer0.vara.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../organizations/peerOrganizations/vara.example.com/peers/peer0.vara.example.com/tls:/etc/hyperledger/fabric/tls
+      - ../organizations/peerOrganizations/vara.example.com/users/Admin@vara.example.com/msp:/etc/hyperledger/fabric/admin-msp
+      - ../channel-artifacts:/etc/hyperledger/fabric/channel-artifacts
+      - ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls:/etc/hyperledger/fabric/orderer-tls
+      - ../organizations/peerOrganizations/sahaj.example.com/msp/tlscacerts:/etc/hyperledger/fabric/sahaj-tls:ro
+      - peer0.vara.example.com:/var/hyperledger/production
+      - /var/run/docker.sock:/host/var/run/docker.sock
+    ports:
+      - '7051:7051'
+      - '9444:9444'
+    depends_on:
+      - couchdb0
+    networks:
+      - land_network
+
+  peer0.sahaj.example.com:
+    container_name: peer0.sahaj.example.com
+    image: hyperledger/fabric-peer:2.5.12
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      - FABRIC_LOGGING_SPEC=${FABRIC_LOGGING_SPEC:-INFO}
+      - CORE_PEER_TLS_ENABLED=true
+      - CORE_PEER_PROFILE_ENABLED=true
+      - CORE_PEER_TLS_CERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_KEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/combined-ca.crt
+      - CORE_PEER_TLS_CLIENTCERT_FILE=/etc/hyperledger/fabric/tls/server.crt
+      - CORE_PEER_TLS_CLIENTKEY_FILE=/etc/hyperledger/fabric/tls/server.key
+      - CORE_PEER_TLS_CLIENTROOTCAS_FILES=/etc/hyperledger/fabric/tls/combined-ca.crt
+      - CORE_PEER_ID=peer0.sahaj.example.com
+      - CORE_PEER_ADDRESS=peer0.sahaj.example.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.sahaj.example.com:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.sahaj.example.com:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.sahaj.example.com:8051
+      - CORE_PEER_GOSSIP_USELEADERELECTION=false
+      - CORE_PEER_GOSSIP_ORGLEADER=true
+      - CORE_PEER_LOCALMSPID=SahajMSP
+      - CORE_PEER_MSPCONFIGPATH=/etc/hyperledger/fabric/msp
+      - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME=${COUCHDB_USER:-admin}
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD=${COUCHDB_PASSWORD:-change-me}
+      - CORE_OPERATIONS_LISTENADDRESS=0.0.0.0:10444
+      - CORE_METRICS_PROVIDER=prometheus
+      - CORE_VM_DOCKER_HOSTCONFIG_NETWORKMODE=docker_land_network
+      - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
+    working_dir: /root
+    command: peer node start
+    volumes:
+      - ../organizations/peerOrganizations/sahaj.example.com/peers/peer0.sahaj.example.com/msp:/etc/hyperledger/fabric/msp
+      - ../organizations/peerOrganizations/sahaj.example.com/peers/peer0.sahaj.example.com/tls:/etc/hyperledger/fabric/tls
+      - ../organizations/peerOrganizations/sahaj.example.com/users/Admin@sahaj.example.com/msp:/etc/hyperledger/fabric/admin-msp
+      - ../channel-artifacts:/etc/hyperledger/fabric/channel-artifacts
+      - ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls:/etc/hyperledger/fabric/orderer-tls
+      - ../organizations/peerOrganizations/vara.example.com/msp/tlscacerts:/etc/hyperledger/fabric/vara-tls:ro
+      - peer0.sahaj.example.com:/var/hyperledger/production
+      - /var/run/docker.sock:/host/var/run/docker.sock
+    ports:
+      - '8051:8051'
+      - '10444:10444'
+    depends_on:
+      - couchdb1
+    networks:
+      - land_network
+
+networks:
+  land_network:
+    name: docker_land_network
+    external: true
+
+volumes:
+  peer0.vara.example.com:
+  peer0.sahaj.example.com:

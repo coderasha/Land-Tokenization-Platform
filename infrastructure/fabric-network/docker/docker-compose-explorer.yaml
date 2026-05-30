@@ -1,0 +1,64 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${CONTAINER_LOG_MAX_SIZE:-50m}
+    max-file: '${CONTAINER_LOG_MAX_FILES:-5}'
+
+services:
+  explorerdb:
+    image: postgres:14
+    container_name: explorerdb
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      POSTGRES_DB: ${EXPLORER_DB_NAME:-fabricexplorer}
+      POSTGRES_USER: ${EXPLORER_DB_USER:-hppoc}
+      POSTGRES_PASSWORD: ${EXPLORER_DB_PASSWORD:-change-me}
+    ports:
+      - '5432:5432'
+    volumes:
+      - explorerdb_data_v2:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${EXPLORER_DB_USER:-hppoc} -d ${EXPLORER_DB_NAME:-fabricexplorer}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - land_network
+
+  explorer:
+    image: hyperledger/explorer:latest
+    container_name: explorer
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      explorerdb:
+        condition: service_healthy
+    environment:
+      DISCOVERY_AS_LOCALHOST: 'false'
+      LOG_LEVEL_APP: ${EXPLORER_LOG_LEVEL_APP:-info}
+      LOG_LEVEL_DB: ${EXPLORER_LOG_LEVEL_DB:-info}
+      LOG_LEVEL_CONSOLE: ${EXPLORER_LOG_LEVEL_CONSOLE:-info}
+      FABRIC_CFG_PATH: /opt/explorer/app/platform/fabric
+      DATABASE_HOST: explorerdb
+      DATABASE_PORT: '5432'
+      DATABASE_DATABASE: ${EXPLORER_DB_NAME:-fabricexplorer}
+      DATABASE_USERNAME: ${EXPLORER_DB_USER:-hppoc}
+      DATABASE_PASSWD: ${EXPLORER_DB_PASSWORD:-change-me}
+    ports:
+      - '8081:8080'
+    volumes:
+      - ../explorer/explorerconfig.json:/opt/explorer/app/explorerconfig.json:ro
+      - ../explorer/runtime-fabric:/opt/explorer/app/platform/fabric
+      - ../explorer/dbconfig:/opt/explorer/app/persistence/fabric/postgreSQL
+      - ../organizations:/tmp/crypto
+    networks:
+      - land_network
+
+networks:
+  land_network:
+    external: true
+    name: docker_land_network
+
+volumes:
+  explorerdb_data_v2:

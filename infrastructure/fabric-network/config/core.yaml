@@ -1,0 +1,7 @@
+# This repository drives peer behavior primarily through environment variables in
+# docker/docker-compose-peers.yaml.
+#
+# Keep this file as a documented placeholder rather than an empty tracked file.
+# If you decide to switch to mounted core.yaml-based configuration, replace this
+# comment block with the audited peer configuration and version it alongside the
+# compose changes.

@@ -1,0 +1,39 @@
+name: land-tokenization-discovery
+version: 1.0.0
+client:
+  organization: Vara
+  connection:
+    timeout:
+      peer:
+        endorser: 300
+channels:
+  landchannel:
+    peers:
+      peer0.vara.example.com:
+        discover: true
+      peer0.sahaj.example.com:
+        discover: true
+organizations:
+  Vara:
+    mspid: VaraMSP
+    peers:
+      - peer0.vara.example.com
+  Sahaj:
+    mspid: SahajMSP
+    peers:
+      - peer0.sahaj.example.com
+peers:
+  peer0.vara.example.com:
+    url: grpcs://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.vara.example.com
+      hostnameOverride: peer0.vara.example.com
+    tlsCACerts:
+      path: ../organizations/peerOrganizations/vara.example.com/peers/peer0.vara.example.com/tls/ca.crt
+  peer0.sahaj.example.com:
+    url: grpcs://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: peer0.sahaj.example.com
+      hostnameOverride: peer0.sahaj.example.com
+    tlsCACerts:
+      path: ../organizations/peerOrganizations/sahaj.example.com/peers/peer0.sahaj.example.com/tls/ca.crt

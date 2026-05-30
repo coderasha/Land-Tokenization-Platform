@@ -1,21 +1,24 @@
-version: '3.9'
-
-networks:
-  land_network:
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: ${CONTAINER_LOG_MAX_SIZE:-50m}
+    max-file: '${CONTAINER_LOG_MAX_FILES:-5}'
 
 services:
-
   ca_orderer:
     image: hyperledger/fabric-ca:1.5.15
     container_name: ca_orderer
+    restart: unless-stopped
+    logging: *default-logging
     environment:
-      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca-orderer
-      - FABRIC_CA_SERVER_TLS_ENABLED=true
-      - FABRIC_CA_SERVER_PORT=7054
+      FABRIC_CA_HOME: /etc/hyperledger/fabric-ca-server
+      FABRIC_CA_SERVER_CA_NAME: ca-orderer
+      FABRIC_CA_SERVER_TLS_ENABLED: 'true'
+      FABRIC_CA_SERVER_PORT: 7054
     ports:
-      - "7054:7054"
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - '7054:7054'
+    command: >-
+      sh -c 'fabric-ca-server start -b ${CA_ORDERER_BOOTSTRAP_USER:-admin}:${CA_ORDERER_BOOTSTRAP_PASSWORD:-change-me} -d'
     volumes:
       - ../organizations/fabric-ca/ordererOrg:/etc/hyperledger/fabric-ca-server
     networks:
@@ -24,14 +27,17 @@ services:
   ca_vara:
     image: hyperledger/fabric-ca:1.5.15
     container_name: ca_vara
+    restart: unless-stopped
+    logging: *default-logging
     environment:
-      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca-vara
-      - FABRIC_CA_SERVER_TLS_ENABLED=true
-      - FABRIC_CA_SERVER_PORT=8054
+      FABRIC_CA_HOME: /etc/hyperledger/fabric-ca-server
+      FABRIC_CA_SERVER_CA_NAME: ca-vara
+      FABRIC_CA_SERVER_TLS_ENABLED: 'true'
+      FABRIC_CA_SERVER_PORT: 8054
     ports:
-      - "8054:8054"
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - '8054:8054'
+    command: >-
+      sh -c 'fabric-ca-server start -b ${CA_VARA_BOOTSTRAP_USER:-admin}:${CA_VARA_BOOTSTRAP_PASSWORD:-change-me} -d'
     volumes:
       - ../organizations/fabric-ca/vara:/etc/hyperledger/fabric-ca-server
     networks:
@@ -40,15 +46,23 @@ services:
   ca_sahaj:
     image: hyperledger/fabric-ca:1.5.15
     container_name: ca_sahaj
+    restart: unless-stopped
+    logging: *default-logging
     environment:
-      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca-sahaj
-      - FABRIC_CA_SERVER_TLS_ENABLED=true
-      - FABRIC_CA_SERVER_PORT=9054
+      FABRIC_CA_HOME: /etc/hyperledger/fabric-ca-server
+      FABRIC_CA_SERVER_CA_NAME: ca-sahaj
+      FABRIC_CA_SERVER_TLS_ENABLED: 'true'
+      FABRIC_CA_SERVER_PORT: 9054
     ports:
-      - "9054:9054"
-    command: sh -c 'fabric-ca-server start -b admin:adminpw -d'
+      - '9054:9054'
+    command: >-
+      sh -c 'fabric-ca-server start -b ${CA_SAHAJ_BOOTSTRAP_USER:-admin}:${CA_SAHAJ_BOOTSTRAP_PASSWORD:-change-me} -d'
     volumes:
       - ../organizations/fabric-ca/sahaj:/etc/hyperledger/fabric-ca-server
     networks:
       - land_network
+
+networks:
+  land_network:
+    external: true
+    name: docker_land_network

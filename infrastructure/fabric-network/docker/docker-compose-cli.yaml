@@ -1,0 +1,3 @@
+# Legacy placeholder.
+# This repository does not rely on a separate Fabric CLI container.
+# Use the scripts under ../scripts and the service containers directly.

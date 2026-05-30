@@ -1,0 +1,69 @@
+name: land-tokenization-sahaj
+version: 1.0.0
+client:
+  organization: Sahaj
+channels:
+  landchannel:
+    orderers:
+      - orderer0.example.com
+      - orderer1.example.com
+      - orderer2.example.com
+    peers:
+      peer0.vara.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+      peer0.sahaj.example.com:
+        endorsingPeer: true
+        chaincodeQuery: true
+        ledgerQuery: true
+        eventSource: true
+organizations:
+  Vara:
+    mspid: VaraMSP
+    peers:
+      - peer0.vara.example.com
+    certificateAuthorities: []
+  Sahaj:
+    mspid: SahajMSP
+    peers:
+      - peer0.sahaj.example.com
+    certificateAuthorities: []
+orderers:
+  orderer0.example.com:
+    url: grpcs://localhost:7050
+    grpcOptions:
+      ssl-target-name-override: orderer0.example.com
+      hostnameOverride: orderer0.example.com
+    tlsCACerts:
+      path: ../organizations/ordererOrganizations/example.com/orderers/orderer0.example.com/tls/ca.crt
+  orderer1.example.com:
+    url: grpcs://localhost:8050
+    grpcOptions:
+      ssl-target-name-override: orderer1.example.com
+      hostnameOverride: orderer1.example.com
+    tlsCACerts:
+      path: ../organizations/ordererOrganizations/example.com/orderers/orderer1.example.com/tls/ca.crt
+  orderer2.example.com:
+    url: grpcs://localhost:9050
+    grpcOptions:
+      ssl-target-name-override: orderer2.example.com
+      hostnameOverride: orderer2.example.com
+    tlsCACerts:
+      path: ../organizations/ordererOrganizations/example.com/orderers/orderer2.example.com/tls/ca.crt
+peers:
+  peer0.vara.example.com:
+    url: grpcs://localhost:7051
+    grpcOptions:
+      ssl-target-name-override: peer0.vara.example.com
+      hostnameOverride: peer0.vara.example.com
+    tlsCACerts:
+      path: ../organizations/peerOrganizations/vara.example.com/peers/peer0.vara.example.com/tls/ca.crt
+  peer0.sahaj.example.com:
+    url: grpcs://localhost:8051
+    grpcOptions:
+      ssl-target-name-override: peer0.sahaj.example.com
+      hostnameOverride: peer0.sahaj.example.com
+    tlsCACerts:
+      path: ../organizations/peerOrganizations/sahaj.example.com/peers/peer0.sahaj.example.com/tls/ca.crt
