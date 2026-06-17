@@ -73,6 +73,34 @@ Organizations:
       - Host: peer0.sahaj.example.com
         Port: 8051
 
+
+  - &Fujitsu
+    Name: FujitsuMSP
+    ID: FujitsuMSP
+
+    MSPDir: ../organizations/peerOrganizations/fujitsu.example.com/msp
+
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('FujitsuMSP.admin', 'FujitsuMSP.peer', 'FujitsuMSP.client')"
+
+      Writers:
+        Type: Signature
+        Rule: "OR('FujitsuMSP.admin', 'FujitsuMSP.client')"
+
+      Admins:
+        Type: Signature
+        Rule: "OR('FujitsuMSP.admin')"
+
+      Endorsement:
+        Type: Signature
+        Rule: "OR('FujitsuMSP.peer')"
+
+    AnchorPeers:
+      - Host: peer0.fujitsu.example.com
+        Port: 9051        
+
 Capabilities:
 
   Channel: &ChannelCapabilities
@@ -205,6 +233,7 @@ Profiles:
         Organizations:
           - *Vara
           - *Sahaj
+          - *Fujitsu
 
   LandChannel:
 
@@ -219,8 +248,7 @@ Profiles:
         - *OrdererOrg
 
     Application:
-      <<: *ApplicationDefaults
-
       Organizations:
         - *Vara
         - *Sahaj
+        - *Fujitsu
